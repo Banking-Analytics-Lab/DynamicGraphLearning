@@ -1,4 +1,4 @@
-*/rappi_venv/*
+
 !*/reqs/*.txt
 #ignore text files to not have data leaks
 *.csv 
