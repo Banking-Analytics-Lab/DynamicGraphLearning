@@ -1,0 +1,15 @@
+gensim==4.2.0
+llvmlite==0.38.1+computecanada
+nptyping==2.2.0
+numba==0.55.2+computecanada
+numba-progress==0.0.2
+numpy==1.22.2+computecanada
+pandas==1.4.1+computecanada
+pecanpy==2.0.5
+python-dateutil==2.8.2+computecanada
+pytz==2022.1+computecanada
+scipy==1.8.0+computecanada
+six==1.16.0+computecanada
+smart-open==6.0.0
+tqdm==4.64.0+computecanada
+typing-extensions==4.3.0
