@@ -1,8 +1,0 @@
-*/rappi_venv/*
-
-#ignore text files to not have data leaks
-*.csv 
-*.edg
-*.tsv
-*.txt
-
