@@ -81,8 +81,8 @@ for tag in df.Tag:
 
    
 
-final = pd.merge(pd.merge(pd.merge(pd.merge(pd.merge(population_df,population_male_female_df, how = 'inner'),fertility_df, how = 'inner'),mortality_df, how = 'inner'), migration_df, how = 'inner'),
-economics_df, how = 'inner') 
+final = pd.merge(pd.merge(pd.merge(pd.merge(pd.merge(pd.merge(population_df,population_male_female_df, how = 'inner'),fertility_df, how = 'inner'),mortality_df, how = 'inner'), migration_df, how = 'inner'),
+economics_df, how = 'inner'),  cities_df, how = 'inner')
 final.to_excel('./scrapped/Final data for clustering.xlsx', index = False)
 
 
