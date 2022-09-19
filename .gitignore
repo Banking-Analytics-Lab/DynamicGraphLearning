@@ -5,7 +5,6 @@
 *.edg
 *.tsv
 logs/
-scrapped/
 notebooks/
 models_final/
 models/
@@ -17,3 +16,5 @@ execution_scripts/
 */data
 .vscode/
 .env
+*.cpython-38.pyc
+*.npy
