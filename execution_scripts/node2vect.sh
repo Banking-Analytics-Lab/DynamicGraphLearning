@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=def-cbravo
-#SBATCH --mem-per-cpu=10G      # increase as needed
-#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=150G      # increase as needed
+#SBATCH --cpus-per-task=2
 #SBATCH --time=1:00:00
 
 rappi_folder=$HOME/projects/def-cbravo/rappi_data
