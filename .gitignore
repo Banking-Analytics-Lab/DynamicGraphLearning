@@ -4,5 +4,14 @@
 *.csv 
 *.edg
 *.tsv
-
-
+*/logs
+*/scrapped
+*/notebooks
+*/models_final
+*/models
+*/execution_scripts
+*/TGN
+*/methods/GNN_LSTM/sbatch_maker.ipynb
+*/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/gru_safe.py
+*.ipynbcheckpoints
+*/data
