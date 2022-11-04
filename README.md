@@ -1,58 +1,43 @@
 # Influencer Detection with Dynamic Graph Neural Networks 
 
+This repository contain the code used in the paper E. Tiukhova, E. Penaloza, M. Óskarsdóttir, H. Garcia, A. Correa Bahnsen, B. Baesens, M. Snoeck, C. Bravo. Influencer Detection with Dynamic Graph Neural Networks. Accepted at Temporal Graph Learning workshop, NeurIPS, 2022
+Link to the paper: TBD
+Link to the poster: TBD
+
 ## Project structure: 
 
 The project repo holds the following structure
 ```
- |-execution_scripts
- | |-Method.sh
+ |-models
+ | |-GNNs.py
+ | |-RNNs.py
+ | |-decoder.py
+ | |-models.py
  |-reqs
- | |-Method_PythonVersion.txt
- |-methods
- | |-method
- | | |-main.py
- | | |-__init__.py
- | |-Build_Data
- | | |-__init__.py
- | | |-dataBuilder.py
+ | |-DYNAMIC_GRAPHS_3.8.10.txt
+ |-utils
+ | |-utils.py
+ |-make_data.py
+ |-train.py
+ 
 
 ```
+### models
 
-### execution_scripts
-Holds sh scripts for sbatch execution. 
-Should be setup in a way such that we only run 
-
-```
-sbatch /execution_scripts/method.sh
-```
+This folder contains the .py files used to make combinations of encoder and decoder in dynamic GNN models as well as create baseline models.
 
 ### reqs
 
-Requirment files to create appropriate venvs for experiment. File name of requirments file should be in the following format: 
+This folder contains the files that lists all of a project's dependencies.
 
-```
-Method_PythonVersion.txt
-```
+### utils
 
-To create and activate a venv for the specific method: 
+This folder contains a .py file that provides functions for several files.
 
-```
-module load python/PYTHON_VERSION
-python3 -m venv $HOME/Method
-source $HOME/Method
-pip install -r Method_PythonVersion.txt
-```
+### make_data.py
 
-### Methods 
+The script to generate the network data and preprocess it. 
 
-All method code should go inside the 
+### train.py
 
-```
-/methods/Method/main.py
-```
-
-
-### Build_Data
-
-Data pipelines to set up data in appropriate structure for method to process. 
-
+The script to run the experiments. 
