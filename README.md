@@ -1,4 +1,4 @@
-# Rappi Anomaly Detection 
+# Influencer Detection with Dynamic Graph Neural Networks 
 
 ## Project structure: 
 
