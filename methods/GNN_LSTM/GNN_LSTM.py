@@ -40,6 +40,9 @@ import pandas as pd
 from scipy.spatial.distance import pdist,squareform
 from IPython.display import display
 import wandb
+torch.manual_seed(1)
+np.random.seed(0)
+
 
 parser = argparse.ArgumentParser(description='GNN parser')
 parser.add_argument('--GNN', default = 'GCN',
@@ -74,8 +77,8 @@ parser.add_argument('--lr_decay', default = .9,type = float,
                     help='to run LSTM /GRU on batch or for loop basis')    
 parser.add_argument('--boot_sample', default = 10000,type = int,
                     help='to run LSTM /GRU on batch or for loop basis')        
-# path is /home/etiukhov/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/data         
-parser.add_argument('--repo_path', default = f'/home/etiukhov/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/',type = str,
+# path is /home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/data         
+parser.add_argument('--repo_path', default = f'/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/',type = str,
                     help='to run LSTM /GRU on batch or for loop basis')                    
 # dataset name 
 parser.add_argument('--dataset_name', default = 'TGN_paper',type = str,
@@ -211,6 +214,7 @@ def train_foward(model_GAT,model_RNN,model_FFNN,h0,h_dict,window,data_dict,train
                     else:
                         (hidden_states) = model_RNN(torch.Tensor(h), hidden_states)
 
+            print(hidden_states)    
         if isinstance(model_RNN,LSTMClassification): 
             # we upsample at the step of RNN   
             if training == 'RNN': 
@@ -225,7 +229,7 @@ def train_foward(model_GAT,model_RNN,model_FFNN,h0,h_dict,window,data_dict,train
                 hidden_states,labs,synth_index = recon_upsample(hidden_states,data.y,data.edge_index,sample_rate)
   
             scores = model_FFNN(hidden_states)
-            
+
         if training:     
             return scores,torch.Tensor(labs),h0,synth_index
         else:
@@ -307,6 +311,8 @@ def train(data_dict,ts_list,model_GAT, model_RNN, model_FFNN,n_epoch,lr,\
                 scores,labels,h0 =\
                     train_foward(model_GAT,model_RNN,model_FFNN,h0,h_dict,\
                         window = month_window,data_dict=data_dict,sample_rate=sample_rate)
+                print(scores)
+                exit(0)
                 synth_index = []
 
             # scores,labels,h0 =\
@@ -655,10 +661,10 @@ def get_data_node_classification(dataset_name, GCN,full_batch,base):
     #change path
 
     if GCN == 'GAT': 
-        datas = torch.load('/home/etiukhov/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/data/TGN_paper_GAT.pt')
+        datas = torch.load('/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/data/TGN_paper_GAT.pt')
         ts_iter = sorted(datas.keys())
     elif GCN == 'GCN': 
-        datas = torch.load('/home/etiukhov/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/data/TGN_paper_GCN.pt')
+        datas = torch.load('/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/data/TGN_paper_GCN.pt')
         ts_iter = sorted(datas.keys())
 
     return datas,ts_iter
@@ -733,6 +739,7 @@ class GAT(torch.nn.Module):
         h = self.gat2(h, edge_index, edge_feats)
         h = F.relu(h)
         h = F.dropout(h, self.dropout_rate)
+       
         return h
 
 class Attention(torch.nn.Module):
@@ -816,6 +823,7 @@ n_nodes =   data_dict[ts_list[0]].x.shape[0]
 
 if args.GNN == 'GAT':
     model_GAT = GAT(25, num_hidden, num_embeddings,edge_dim = data_dict[ts_list[0]].edge_attr.shape[1],heads = num_heads ,num_layers=n_layers, dropout_rate = dropout_rate)
+    model_GAT.load_state_dict(torch.load('/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/model.pt'))
 elif args.GNN == 'GCN': 
     model_GAT = GCN(25, num_hidden, num_embeddings,num_layers=n_layers, dropout_rate = dropout_rate)
 if args.RNN == 'GRU':
@@ -823,6 +831,8 @@ if args.RNN == 'GRU':
                             input_dim=num_embeddings, 
                             n_nodes = n_nodes,
                             )
+    model_RNN.load_state_dict(torch.load('/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/model_rnn.pt'))
+    
 elif args.RNN == 'LSTM':
     model_RNN = LSTMClassification(hidden_dim = num_hidden, 
                             input_dim=num_embeddings, 
@@ -848,7 +858,7 @@ total = t1-t0
 print(total)
 # Save a trained model to a file.
 
-p = f'/home/etiukhov/projects/def-cbravo/etiukhov/Journal_paper'
+p = f'/home/emiliano/projects/def-cbravo/etiukhov/Journal_paper'
 path = p + f'/models/{args.run}'
 
 isExist = os.path.exists(path)
