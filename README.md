@@ -1,8 +1,11 @@
 # Influencer Detection with Dynamic Graph Neural Networks 
 
 This repository contain the code used in the paper E. Tiukhova, E. Penaloza, M. Óskarsdóttir, H. Garcia, A. Correa Bahnsen, B. Baesens, M. Snoeck, C. Bravo. Influencer Detection with Dynamic Graph Neural Networks. Accepted at Temporal Graph Learning workshop, NeurIPS, 2022
+
 Link to the paper: TBD
+
 Link to the poster: TBD
+
 
 ## Project structure: 
 
