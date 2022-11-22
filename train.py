@@ -23,34 +23,33 @@ def get_var_name(variable):
         for name, value in globals().items():
             if value is v:
                 names.append(name)
-
     return names
 
-parser = argparse.ArgumentParser('Interface for TGN data preprocessing')
-parser.add_argument('--GNN', type=str, help='Dataset name (eg. wikipedia or reddit)',
-                        default='')
-parser.add_argument('--RNN', type=str, help='Dataset name (eg. wikipedia or reddit)',default = '')
-parser.add_argument('--DECODER', type=str, help='Dataset name (eg. wikipedia or reddit)',default = 'LIN')
-parser.add_argument('--gnn_input_dim', type=int, help='Dataset name (eg. wikipedia or reddit)',default =25)
-parser.add_argument('--gnn_output_dim', type=int, help='Dataset name (eg. wikipedia or reddit)',default =200)
-parser.add_argument('--embedding_dim', type=int, help='Dataset name (eg. wikipedia or reddit)',default =200)
-parser.add_argument('--heads', type=int, help='Dataset name (eg. wikipedia or reddit)',default =2)
+parser = argparse.ArgumentParser('Training execution')
+parser.add_argument('--GNN', type=str, help='GAT, SAGE, GCN GIN',default='')
+parser.add_argument('--RNN', type=str, help='RNN, GRU/LSTM',default = '')
+parser.add_argument('--DECODER', type=str, help='decoder',default = 'LIN')
+parser.add_argument('--gnn_input_dim', type=int, help='input dim for GNN, defaults to number of features',default =25)
+parser.add_argument('--gnn_output_dim', type=int, help='output dim of gnn, matches input dim of RNN in combined models',default =200)
+parser.add_argument('--embedding_dim', type=int, help='hidden dimension for GNN layers',default =200)
+parser.add_argument('--heads', type=int, help='attention heads',default =2)
 parser.add_argument('--dropout_rate', default = 0.2, help='Dropout rate',type = float)
-parser.add_argument('--RNN_hidden_dim', type=int, help='Dataset name (eg. wikipedia or reddit)',default =200)
-parser.add_argument('--RNN_layers', type=int, help='Dataset name (eg. wikipedia or reddit)',default =1)
-parser.add_argument('--GNN_layers', type=int, help='Dataset name (eg. wikipedia or reddit)',default =2)
-parser.add_argument('--upsample_rate', type=float, help='Dataset name (eg. wikipedia or reddit)',default =0)
+parser.add_argument('--RNN_hidden_dim', type=int, help='hidden dim for RNNs',default =200)
+parser.add_argument('--RNN_layers', type=int, help='layers for RNN',default =1)
+parser.add_argument('--GNN_layers', type=int, help='layers for gnn',default =2)
+parser.add_argument('--upsample_rate', type=float, help='upsample rate for embedding upsampleing',default =0)
 parser.add_argument('--page_rank', action='store_true', help='Whether the graph is bipartite')
-parser.add_argument('--epochs', type=int, help='Dataset name (eg. wikipedia or reddit)',default =5)
-parser.add_argument('--lr', type=float, help='Dataset name (eg. wikipedia or reddit)',default =.0001)
-parser.add_argument('--boot_sample', type=int, help='Dataset name (eg. wikipedia or reddit)',default =10000)
-parser.add_argument('--data_name', type=str, help='Dataset name (eg. wikipedia or reddit)',default = 'TGN_paper')
-parser.add_argument('--loss', type=str, help='Dataset name (eg. wikipedia or reddit)',default = 'bce')
-parser.add_argument('--full_windows', action='store_true', help='Whether the graph is bipartite')
-parser.add_argument('--run_name', type=str, help='Dataset name (eg. wikipedia or reddit)',default = '')
-parser.add_argument('--log_file', type=str, help='Dataset name (eg. wikipedia or reddit)',default = 'logs.csv')
-
-
+parser.add_argument('--epochs', type=int, help='epochs',default =5)
+parser.add_argument('--lr', type=float, help='learning rate',default =.0001)
+parser.add_argument('--eps', type=float, help='epsilon for GIN',default =0)
+parser.add_argument('--boot_sample', type=int, help='sample size for bootstrap',default =10000)
+parser.add_argument('--data_name', type=str, help='data name',default = 'TGN_paper')
+parser.add_argument('--loss', type=str, help='loss name',default = 'bce')
+parser.add_argument('--full_windows', action='store_true', help='Use full windows or not')
+parser.add_argument('--train_eps', action='store_true', help='Train eps for GIN')
+parser.add_argument('--search_depth_SAGE', type=int, help='Depth for SAGE search',default =2)
+parser.add_argument('--run_name', type=str, help='Name with combination of hps being ran',default = '')
+parser.add_argument('--log_file', type=str, help='Log file',default = 'logs.csv')
 args = parser.parse_args()
 
 RNN = args.RNN
@@ -62,7 +61,12 @@ if page_rank:
 elif not GNN: 
     GNN_type = 'GCN'
 else: 
-    GNN_type = GNN
+    if GNN == 'GIN' or GNN == 'GAT' : 
+        GNN_type = 'GAT'
+        GNN = 'GAT'
+    else: 
+        GNN
+        GNN_type = 'GAT'
 
 data_path = f'./data/{args.data_name}_{GNN_type}.pt'
 
@@ -74,10 +78,6 @@ ts_list = list(data_dict.keys())
 ts_list = [int(x) for x in ts_list]
 n_nodes =   data_dict[ts_list[0]].x.shape[0]
 n_feats =   data_dict[ts_list[0]].x.shape[1]
-
-
-
-
 rnn_input_dim = args.gnn_output_dim if GNN else n_feats
 
 rnn_kw = { 
@@ -88,22 +88,22 @@ rnn_kw = {
     'upsample' : args.upsample_rate,
     'n_nodes' : n_nodes 
 }
-
 gnn_kw ={ 
     'GNN' : args.GNN,
     'gnn_input_dim': args.gnn_input_dim,
     'gnn_embedding_dim' : args.embedding_dim,
     'heads' : args.heads,
     'dropout_rate': args.dropout_rate,
-    'edge_dim' :data_dict[ts_list[0]].edge_attr.shape[1] if args.GNN == 'GAT' else None,
+    'edge_dim' :data_dict[ts_list[0]].edge_attr.shape[1] if GNN == 'GAT' else None,
     'gnn_output_dim' : args.gnn_output_dim,
-    'gnn_layers': args.GNN_layers
+    'gnn_layers': args.GNN_layers,
+    'eps': args.eps, 
+    'train_eps' : args.train_eps,
+    'search_depth': args.search_depth_SAGE
 }
 decoder_kw = {
     "DECODER": args.DECODER
 }
-
-
 epochs = args.epochs
 # other_kw = {'lr': args.lr , 'page_rank':args.page_rank, 'upsample_rate': args.upsample_rate,'epochs':args.epochs }
 # kw = {**decoder_kw,**rnn_kw,**gnn_kw,**other_kw}
