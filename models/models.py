@@ -1,4 +1,5 @@
 from pprint import pprint
+from re import search
 from turtle import forward, hideturtle
 from typing import Tuple
 from utils.utils import upsample_embeddings
@@ -21,7 +22,7 @@ class Model(nn.Module):
         pass 
 
 class RNN_GNN(Model): 
-    def __init__(self,upsample,n_nodes, RNN, GNN,DECODER , gnn_input_dim,rnn_input_dim, gnn_embedding_dim,rnn_hidden_dim , gnn_output_dim,rnn_layers,gnn_layers,heads, dropout_rate, edge_dim,**kwargs  ) -> None:
+    def __init__(self,upsample,n_nodes, RNN, GNN,DECODER , gnn_input_dim,rnn_input_dim, gnn_embedding_dim,rnn_hidden_dim , gnn_output_dim,rnn_layers,gnn_layers,heads, dropout_rate, edge_dim,train_eps,eps,search_depth,**kwargs  ) -> None:
         super().__init__()
         rnn_kw = { 
             'hidden_dim' : rnn_hidden_dim,
@@ -36,7 +37,10 @@ class RNN_GNN(Model):
             'heads' : heads,
             'dropout_rate': dropout_rate,
             'edge_dim' : edge_dim,
-            'output_dim' : gnn_output_dim
+            'output_dim' : gnn_output_dim,
+            'train_eps' : train_eps,
+            'eps':  eps ,
+            'search_depth':search_depth
         }
         self.upsample = upsample
         self.RNN = get_RNN(RNN)(**rnn_kw)
@@ -102,7 +106,7 @@ class RNN_only(Model):
 
 
 class GNN_only(Model): 
-    def __init__(self, GNN,DECODER, gnn_input_dim, gnn_embedding_dim , gnn_output_dim,gnn_layers,heads, dropout_rate, edge_dim ,**kwargs  ) -> None:
+    def __init__(self, GNN,DECODER, gnn_input_dim, gnn_embedding_dim , gnn_output_dim,gnn_layers,heads, dropout_rate, edge_dim ,eps ,train_eps,search_depth,**kwargs  ) -> None:
         super().__init__()
         gnn_kw = {
             'embedding_dim': gnn_embedding_dim, 
@@ -111,8 +115,10 @@ class GNN_only(Model):
             'heads' : heads,
             'dropout_rate': dropout_rate,
             'edge_dim' : edge_dim,
-            'output_dim' : gnn_output_dim
-
+            'output_dim' : gnn_output_dim,
+            'train_eps' : train_eps,
+            'eps':  eps ,
+            'search_depth':search_depth
         }
         self.GNN = get_GNN(GNN)(**gnn_kw)
         self.decoder = get_decoder(DECODER)(gnn_output_dim)
