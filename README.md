@@ -4,7 +4,7 @@ This repository contain the code used in the paper E. Tiukhova, E. Penaloza, M. 
 
 Link to the paper: https://arxiv.org/abs/2211.09664
 
-Link to the poster: TBD
+Link to the poster: https://neurips.cc/media/PosterPDFs/NeurIPS%202022/56519.png?t=1668072924.9758837
 
 
 ## Project structure: 
