@@ -47,7 +47,7 @@ class RNN_GNN(Model):
         self.GNN = get_GNN(GNN)(**gnn_kw)
         self.decoder = get_decoder(DECODER)(rnn_kw['hidden_dim'])
 
-    def forward(self, month_list,data_dict,h0 = None): 
+    def forward(self, month_list,data_dict,h0 = None,train = True): 
         h0s =   self.RNN.init__hidd() if h0 == None else h0 
         hidden_states = h0s
         for i,m in enumerate(month_list): 
@@ -59,7 +59,8 @@ class RNN_GNN(Model):
                 h0 = [get_hidden(hidden_states[0])]
         last_h = hidden_states[-1]
         last_h = last_h[0] if type(last_h) == tuple else last_h
-        if self.upsample > 0 : 
+        if self.upsample > 0 and train: 
+
             last_h,labs,synth_index  = upsample_embeddings(last_h,data.y,data.edge_index,self.upsample)
         else: 
             synth_index = []
