@@ -46,7 +46,7 @@ def get_metrics(scores,labels, ):
 
     fpr, tpr, thresholds = roc_curve( labels,scores)
     precision, recall, thresholds = precision_recall_curve(labels,scores)
-    
+
     return auc(fpr, tpr),auc(recall,precision)
 
 def get_loss(loss) : 
@@ -71,20 +71,19 @@ def evauluate(model,windows,data_dict,loss_function,train_nodes,unseen_nodes_set
         nodes_to_eval= list(set(data_dict[m].edge_index.flatten()))
         unseen_nodes = list(set(nodes_to_eval ) & unseen_nodes_set)
         seen_nodes = list(set(nodes_to_eval) & train_nodes)
-        scores_for_loss,labels , h0,synth_index = model(month_window, data_dict,h0) 
+        scores_for_loss,labels , h0,synth_index = model(month_window, data_dict,h0,train = False) 
         scores_for_loss = torch.Tensor(scores_for_loss.detach().flatten()).float()
         scores_seen = scores_for_loss[seen_nodes]
         labels_seen = labels[seen_nodes]
-                
+               
         scores_unseen = scores_for_loss[unseen_nodes]
         labels_unseen = labels[unseen_nodes]
-
         loss = loss_function(scores_for_loss, labels)
 
-        auc, auprc = get_metrics(scores_for_loss,labels)
-        seen_auc, seen_auprc = get_metrics(scores_seen,labels_seen)
-        unseen_auc, unseen_auprc = get_metrics(scores_unseen,labels_unseen)
-        
+        auc, auprc = get_metrics(torch.sigmoid(scores_for_loss),labels)
+        seen_auc, seen_auprc = get_metrics(torch.sigmoid(scores_seen),labels_seen)
+        unseen_auc, unseen_auprc = get_metrics(torch.sigmoid(scores_unseen),labels_unseen)
+
         losses.append(loss)
         auprcs.append(auprc)
         auprcs_seen.append(seen_auprc)
