@@ -29,7 +29,7 @@ parser = argparse.ArgumentParser('Training execution')
 parser.add_argument('--GNN', type=str, help='GAT, SAGE, GCN GIN',default='')
 parser.add_argument('--RNN', type=str, help='RNN, GRU/LSTM',default = '')
 parser.add_argument('--DECODER', type=str, help='decoder',default = 'LIN')
-parser.add_argument('--gnn_input_dim', type=int, help='input dim for GNN, defaults to number of features',default =25)
+parser.add_argument('--gnn_input_dim', type=int, help='input dim for GNN, defaults to number of features',default =29)
 parser.add_argument('--gnn_output_dim', type=int, help='output dim of gnn, matches input dim of RNN in combined models',default =200)
 parser.add_argument('--embedding_dim', type=int, help='hidden dimension for GNN layers',default =200)
 parser.add_argument('--heads', type=int, help='attention heads',default =2)
@@ -43,7 +43,7 @@ parser.add_argument('--epochs', type=int, help='epochs',default =5)
 parser.add_argument('--lr', type=float, help='learning rate',default =.0001)
 parser.add_argument('--eps', type=float, help='epsilon for GIN',default =0)
 parser.add_argument('--boot_sample', type=int, help='sample size for bootstrap',default =10000)
-parser.add_argument('--data_name', type=str, help='data name',default = 'TGN_paper')
+parser.add_argument('--city', type=str, help='data name',default = 'CDMX')
 parser.add_argument('--loss', type=str, help='loss name',default = 'bce')
 parser.add_argument('--full_windows', action='store_true', help='Use full windows or not')
 parser.add_argument('--train_eps', action='store_true', help='Train eps for GIN')
@@ -68,7 +68,7 @@ else:
         GNN
         GNN_type = 'GCN'
 
-data_path = f'./data/{args.data_name}_{GNN_type}.pt'
+data_path = f'./data/{args.city}_{GNN_type}.pt'
 
 # wandb.init(project="rappi", entity="emilianouw",settings=wandb.Settings(start_method="fork"))
 # wandb.init(project="Influencer_detection_final", entity="elena-tiukhova", name =f'{run}')
@@ -171,7 +171,8 @@ for e in tqdm(range(epochs)):
         
         loss.backward()
         optimizer.step()
-        auc,auprc = get_metrics(torch.sigmoid(scores_for_loss.detach().numpy()),labels)
+
+        auc,auprc = get_metrics(torch.sigmoid(scores_for_loss).detach().numpy(),labels)
         running_auc.append(auc)
         running_auprc.append(auprc)
         running_loss.append(loss.item())
