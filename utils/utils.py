@@ -37,6 +37,12 @@ def upsample_embeddings(embed, labels,edges,sample_rate,end_index = None):
 
     return embed, labels,synthetic_index
 
+def recon_loss(scores):
+    EPS = 1e-15
+    return -torch.log(scores + EPS ).mean()
+
+
+
 def  auprc_wrap(labels,scores):
     pres, recall, _ = precision_recall_curve(labels, scores)
     return recall,pres,_
@@ -49,9 +55,12 @@ def get_metrics(scores,labels, ):
 
     return auc(fpr, tpr),auc(recall,precision)
 
-def get_loss(loss) : 
+def get_loss(loss,**kwargs) : 
     if loss =='bce': 
         return BCEWithLogitsLoss 
+    if loss =='recon': 
+        return lambda : recon_loss # return identity loss  fun(x) = x, used hen loss is computed in forward pass
+
 
 def get_window(dates):
     return [[int(dates[i-1]),int(dates[i]),int(dates[i+1])] for i in range( 1,len(dates) -1 )]
@@ -107,6 +116,7 @@ def evauluate(model,windows,data_dict,loss_function,train_nodes,unseen_nodes_set
             boot_dict = dict(boot_dict,**d_unseen_auprc)
         else:
             boot_dict = None
+    
 
     return np.mean(aucs),np.mean(aucs_seen),np.mean(aucs_unseen),np.mean(auprcs),np.mean(auprcs_seen),np.mean(auprcs_unseen),np.mean(losses),boot_dict,h0
 

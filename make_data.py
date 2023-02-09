@@ -1,3 +1,4 @@
+from IPython.display import display
 import networkx as nx
 from ast import parse
 import torch
@@ -20,6 +21,7 @@ def preprocess(data_name):
     s = next(f)
     for idx, line in enumerate(f):
       e = line.strip().split(',')
+
       #user id 
       u = int(e[0])
       #item id 
@@ -91,18 +93,20 @@ def make_page_rank(edges,data):
                 h['PageRank'].loc[k] = pagerank_dict[k]*subgraph.number_of_nodes()/total_nodes
     return h.to_numpy()
 
-def run(data_name, page_rank,GCN,val_start ,test_start, bipartite=False):
-    base = '/home/' + os.environ.get('USER') + '/projects/def-cbravo/rappi_data/QTR/'
+def run(city, page_rank,GCN,val_start ,test_start, bipartite=False):
+    base = '/home/' + os.environ.get('USER') + f'/projects/def-cbravo/rappi_data/{city}/'
     Path("data/").mkdir(parents=True, exist_ok=True)
-    PATH =  base + '/{}.csv'.format(data_name)
-
-
+    PATH =  base + 'final_df_{}.csv'.format(city)
+ 
     df, feat = preprocess(PATH)
     new_df = reindex(df, bipartite)
+    new_df.ts = new_df.ts.astype(int)
+
 
     empty = np.zeros(feat.shape[1])[np.newaxis, :]
     feat = np.vstack([empty, feat])
-    sub_set = pd.read_csv(base + 'TGN_fin.csv')
+    sub_set = pd.read_csv(base + f'final_fin_df_{city}.csv')
+    sub_set.START_DATE = sub_set.START_DATE.astype(int)
     numerical = sub_set.drop(columns = ['APPLICATION_USER_ID','START_DATE']).columns
     keys = sub_set[['START_DATE','APPLICATION_USER_ID']]
 
@@ -138,6 +142,7 @@ def run(data_name, page_rank,GCN,val_start ,test_start, bipartite=False):
     sub_set = sub_set.drop(columns = ['START_DATE','APPLICATION_USER_ID'])
     sub_set = pd.concat([keys,sub_set],axis = 1)
     s = sub_set[sub_set.START_DATE == max(sub_set.START_DATE)].shape
+
     out = np.zeros((sub_set.APPLICATION_USER_ID.max() + 2,s[1]-2,max(sub_set.START_DATE)+1))
     for ts in sub_set.START_DATE.unique():
         timed = sub_set[sub_set.START_DATE == ts]
@@ -147,6 +152,7 @@ def run(data_name, page_rank,GCN,val_start ,test_start, bipartite=False):
 
 
     graph_df = new_df
+
     edge_features = feat
     inds = np.argwhere(np.sum(edge_features,axis = 1) ==0 ).flatten()
     #equals 1 due to added edge to match node indexing
@@ -156,13 +162,14 @@ def run(data_name, page_rank,GCN,val_start ,test_start, bipartite=False):
 
 
     n_nodes = node_features.shape[0]
-    label_arr = np.zeros((n_nodes,1,len(graph_df.ts.unique())))
+    label_arr = np.zeros((n_nodes,1,max(graph_df.ts.unique()) + 1 ))
     labels = graph_df.label.values
     datas = {}
-    ts_iter = sorted(graph_df.ts.unique())[4:]
+    ts_iter = sorted(graph_df.ts.unique())
     sum_rows = 0 
 
     assert not all([np.isnan(x).any() for x in [node_features,edge_features,graph_df.to_numpy()]])
+
 
     for ts in ts_iter:
         sub_graph = graph_df[graph_df.ts == ts]
@@ -189,13 +196,13 @@ def run(data_name, page_rank,GCN,val_start ,test_start, bipartite=False):
         print(f'NODE FEATRUE MATRIX IS DIMENSIONS {n_feats.shape}')
     #assert sum_rows == len(graph_df[graph_df.ts.isin(ts_iter)]), 'NOT SAME NODES AS IN EDGES'
     if page_rank: GCN = 'PR'
-    torch.save( datas,'./data/' + f'{data_name}_{GCN}.pt')
+    torch.save( datas,'./data/' + f'{city}_{GCN}.pt')
     print('SAVING COMPLETE')
-    print('SAVED' ,  './data/' + f'{data_name}_{GCN}.pt')
+    print('SAVED' ,  './data/' + f'{city}_{GCN}.pt')
 
 parser = argparse.ArgumentParser('Interface for TGN data preprocessing')
-parser.add_argument('--data', type=str, help='Dataset name (eg. wikipedia or reddit)',
-                        default='wikipedia')
+parser.add_argument('--city', type=str, help='Dataset name (eg. wikipedia or reddit)',
+                        default='CDMX')
 parser.add_argument('--bipartite', action='store_true', help='Whether the graph is bipartite')
 parser.add_argument('--page_rank', action='store_true', help='Whether the graph is bipartite')
 parser.add_argument('--GNN', type=str, help='Dataset name (eg. wikipedia or reddit)',default ='GCN')
@@ -204,4 +211,4 @@ parser.add_argument('--test_start', type=int, help='Dataset name (eg. wikipedia 
 
 args = parser.parse_args()
 
-run(args.data, args.page_rank,args.GNN,args.val_start,args.test_start)
+run(args.city, args.page_rank,args.GNN,args.val_start,args.test_start)

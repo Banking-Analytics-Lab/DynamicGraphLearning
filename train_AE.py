@@ -111,24 +111,9 @@ epochs = args.epochs
 
 
 
-if args.full_windows: 
-    windows=    ts_list[:-3]
-    val_window = ts_list[-3:-1]
-    test_window = ts_list[-1:]
-    print(windows,val_window,test_window)
-    train_nodes= set(list(data_dict[windows[-1]].edge_index.flatten()))
-    val_nodes = set(list(data_dict[val_window[-1]].edge_index.flatten())).difference(train_nodes)
-    test_nodes = set(list(data_dict[test_window[-1]].edge_index.flatten())).difference(train_nodes)
 
-else: 
-    full_windows = get_window(ts_list)
-    windows = full_windows[:-4]
-    val_window = full_windows[-4:-2]
-    test_window = full_windows[-2:]
-    print(windows,val_window,test_window)
-    train_nodes= set(list(data_dict[windows[-1][-1]].edge_index.flatten()))
-    val_nodes = set(list(data_dict[val_window[-1][-1]].edge_index.flatten())).difference(train_nodes)
-    test_nodes = set(list(data_dict[test_window[-1][-1]].edge_index.flatten())).difference(train_nodes)
+
+windows = get_window(ts_list)
 
 
 model = get_model(gnn_kw=gnn_kw,rnn_kw=rnn_kw,decoder_kw=decoder_kw)
@@ -161,66 +146,24 @@ for e in tqdm(range(epochs)):
     for  month_window in windows:
 
         optimizer.zero_grad()
-        scores,labels , h0,synth_index = model(month_window, data_dict,h0) 
-
+        scores_for_loss,labels , h0,synth_index = model(month_window, data_dict,h0) 
         m = month_window if type(month_window) == int else month_window[-1] 
-        nodes_to_backprop = list(set(data_dict[m].edge_index.flatten())) + synth_index
-        labels = labels[nodes_to_backprop].flatten()
-        scores_for_loss = torch.Tensor(scores[nodes_to_backprop]).float().flatten() if scores.size() else scores
-        loss = loss_function(scores_for_loss, labels)
+        loss = loss_function(scores_for_loss)
         
         loss.backward()
         optimizer.step()
 
-        auc,auprc = get_metrics(torch.sigmoid(scores_for_loss).detach().numpy(),labels)
-        running_auc.append(auc)
-        running_auprc.append(auprc)
         running_loss.append(loss.item())
 
+    print(loss.item() , 'epoch: ' ,e )
     model.eval()
 
-    val_auc, val_seen_auc, val_unseen_auc, val_auprc,val_seen_auprc,val_unseen_auprc,val_losses,_,h0\
-        =evauluate(model, val_window ,data_dict,loss_function,train_nodes,val_nodes,h0)
-    train_auc = mean(running_auc)
-    train_auprc = mean(running_auprc)
-    train_loss = mean(running_loss)
-    auc_list.append(train_auc)
-    auprc_list.append(train_auprc)
-    train_losses.append(train_loss)
-
-    metrics = [val_auc,val_seen_auc,val_unseen_auc, val_auprc,val_seen_auprc,val_unseen_auprc,train_auc,train_auprc,train_loss,val_losses]
-    names = get_var_name(metrics)
-    print_log(names,metrics,e)
-
-    logs = {n:m for n,m in zip(names,metrics)}
-    # wandb.log(logs)
-
-
-    if min_val_loss >val_losses  : 
-        min_val_loss = val_losses 
-        best_model= deepcopy(model.state_dict())
-        best_e = e 
     
+    train_losses.append(mean(running_loss))
+
+ 
 
 
-model.load_state_dict(best_model)
-
-
-
-val_final_auc, val_final_seen_auc, val_final_unseen_auc, val_final_auprc, val_final_seen_auprc,val_final_unseen_auprc,val_final_losses,val_boot,val_h0 =evauluate(model, val_window ,data_dict,loss_function,train_nodes,val_nodes,h0,boot =True,boot_size = boots)
-
-test_final_auc, test_final_seen_auc,test_final_unseen_auc, test_final_auprc, test_final_seen_auprc,test_final_unseen_auprc,test_final_losses,test_boot, _ =evauluate(model, test_window ,data_dict,loss_function,train_nodes,test_nodes,val_h0,boot= True,boot_size =boots)
-
-metrics =[val_final_auc,val_final_seen_auc,val_final_unseen_auc,val_final_auprc,val_final_seen_auprc,val_final_unseen_auprc,val_final_losses,test_final_auc,test_final_seen_auc,test_final_unseen_auc,test_final_auprc,test_final_seen_auprc,test_final_unseen_auprc,test_final_losses]
-names = get_var_name(metrics)
-
-print_log(names,metrics,best_e)
-
-print('val boot')
-pprint(val_boot)
-print('test boot')
-pprint(test_boot)
-pprint(logs)
 
 
 

@@ -24,7 +24,7 @@ class GATs(nn.Module):
         #     # print(torch.nn.init.xavier_uniform_(m.unsqueeze(0)))
 
 
-    def forward(self, inp, edge_index,edge_feats):
+    def forward(self, inp, edge_index,edge_feats,train = False):
 
         h = self.gat1(inp, edge_index,edge_attr = edge_feats)
 
@@ -47,7 +47,7 @@ class GATs(nn.Module):
     
 class GCNs(GNN):
   """Graph Convolutional Network"""
-  def __init__(self, input_dim,embedding_dim, output_dim,n_layers,dropout_rate, **kwargs):
+  def __init__(self, input_dim,embedding_dim, output_dim,n_layers,dropout_rate, Train =False, **kwargs):
     super().__init__()
     self.gcn1 = GCNConv(input_dim, embedding_dim)
     self.dropout_rate = dropout_rate
@@ -80,7 +80,7 @@ class GINs(GNN):
         for h_theta_i in self.lin_list:
             self.GIN_list.append(GINEConv(h_theta_i,eps,train_eps=train_eps,edge_dim=edge_dim))
 
-    def forward(self,x ,edge_index,edge_feats):
+    def forward(self,x ,edge_index,edge_feats,train = False):
         h = x
 
         for l in self.GIN_list:

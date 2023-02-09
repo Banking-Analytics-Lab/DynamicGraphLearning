@@ -64,9 +64,11 @@ class RNN_GNN(Model):
             last_h,labs,synth_index  = upsample_embeddings(last_h,data.y,data.edge_index,self.upsample)
         else: 
             synth_index = []
-        scores = self.decoder(last_h)
+        scores = self.decoder(last_h,torch.tensor(data.edge_index))
+
+
        
-       
+
         return scores,torch.Tensor(labs),h0,synth_index
 
 class RNN_only(Model):
@@ -83,7 +85,7 @@ class RNN_only(Model):
         self.RNN = get_RNN(RNN)(**rnn_kw)
         self.decoder = get_decoder(DECODER)(rnn_kw['hidden_dim'])
 
-    def forward(self, month_list,data_dict,h0): 
+    def forward(self, month_list,data_dict,h0,train  = False): 
         h0s =   self.RNN.init__hidd() if h0 == None else h0 
         hidden_states = h0s
         for i,m in enumerate(month_list): 
@@ -100,7 +102,7 @@ class RNN_only(Model):
             last_h,labs,synth_index  = upsample_embeddings(last_h,data.y,data.edge_index,self.upsample)
         else: 
             synth_index = []
-        scores = self.decoder(last_h)
+        scores = self.decoder(last_h,data.edge_index)
 
         return scores,torch.Tensor(labs),h0,synth_index
 
@@ -132,9 +134,15 @@ class GNN_only(Model):
         synth_index = []
         return scores,torch.Tensor(labs),h0,synth_index
 
-    def forward(self,month, data_dict,h0=None):
+    def forward(self,month, data_dict,h0=None,train = False):
         assert type(month) == int, 'CANNOT USE WINDOWS WITH ONLY GNN'
         return self.forward_call(data_dict[month])
+
+
+
+
+
+
 
 def get_model(gnn_kw, rnn_kw,decoder_kw): 
     if gnn_kw['GNN'] and rnn_kw['RNN']: 
