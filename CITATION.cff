@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "DynamicGraphLearning"
+type: software
+repository-code: "https://github.com/Banking-Analytics-Lab/DynamicGraphLearning"
+authors:
+  - family-names: "Tiukhova"
+    given-names: "Elena"
+  - family-names: "Penaloza"
+    given-names: "Emiliano"
+  - family-names: "Óskarsdóttir"
+    given-names: "María"
+  - family-names: "Garcia"
+    given-names: "Hernan"
+  - family-names: "Correa Bahnsen"
+    given-names: "Alejandro"
+  - family-names: "Baesens"
+    given-names: "Bart"
+  - family-names: "Snoeck"
+    given-names: "Monique"
+  - family-names: "Bravo"
+    given-names: "Cristián"
+preferred-citation:
+  type: conference-paper
+  title: "Influencer Detection with Dynamic Graph Neural Networks"
+  year: 2022
+  collection-title: "NeurIPS 2022 Temporal Graph Learning Workshop"
+  conference:
+    name: "NeurIPS 2022 Temporal Graph Learning Workshop"
+  doi: "10.48550/arXiv.2211.09664"
+  url: "https://arxiv.org/abs/2211.09664"
+  authors:
+    - family-names: "Tiukhova"
+      given-names: "Elena"
+    - family-names: "Penaloza"
+      given-names: "Emiliano"
+    - family-names: "Óskarsdóttir"
+      given-names: "María"
+    - family-names: "Garcia"
+      given-names: "Hernan"
+    - family-names: "Correa Bahnsen"
+      given-names: "Alejandro"
+    - family-names: "Baesens"
+      given-names: "Bart"
+    - family-names: "Snoeck"
+      given-names: "Monique"
+    - family-names: "Bravo"
+      given-names: "Cristián"
