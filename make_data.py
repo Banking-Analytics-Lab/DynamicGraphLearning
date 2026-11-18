@@ -92,7 +92,7 @@ def make_page_rank(edges,data):
     return h.to_numpy()
 
 def run(data_name, page_rank,GCN,val_start ,test_start, bipartite=False):
-    base = '/home/' + os.environ.get('USER') + '/projects/def-cbravo/rappi_data/QTR/'
+    base = os.environ.get('DATA_DIR', 'data') + '/'
     Path("data/").mkdir(parents=True, exist_ok=True)
     PATH =  base + '/{}.csv'.format(data_name)
 

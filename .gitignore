@@ -18,6 +18,7 @@ execution_scripts/
 *.sh
 *.pt
 methods/GNN_LSTM/model_files/*
+model_files/
 *.json
 .vscode/
 .env
