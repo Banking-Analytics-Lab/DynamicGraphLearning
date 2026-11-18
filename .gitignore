@@ -1,0 +1,26 @@
+
+!*/reqs/*.txt
+#ignore text files to not have data leaks
+*.csv 
+*.edg
+*.tsv
+logs/
+notebooks/
+models_final/
+
+execution_scripts/
+**/tgn
+*/methods/GNN_LSTM/sbatch_maker.ipynb
+*/home/emiliano/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM/gru_safe.py
+*.ipynbcheckpoints
+*/data
+*.out
+*.sh
+*.pt
+methods/GNN_LSTM/model_files/*
+*.json
+.vscode/
+.env
+*.cpython-38.pyc
+*.npy
+methods/GNN_LSTM/wandb/*
