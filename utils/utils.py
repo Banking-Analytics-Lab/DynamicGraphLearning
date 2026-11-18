@@ -145,7 +145,7 @@ def get_stats(arr,metric = 'auc'):
     return boot_dict
 
 def write_log(metrics, log_file, run_name, model):
-    p = f'/home/etiukhov/projects/def-cbravo/emiliano/RappiAnomalyDetection/methods/GNN_LSTM'
+    p = os.environ.get('OUTPUT_DIR', '.')
     log_file = p + '/logs/' + log_file
     metrics.insert(0,run_name) 
     df = pd.DataFrame({c:[r] for c,r in zip(range(len(metrics)),metrics)})
