@@ -2,7 +2,7 @@
 
 Code for the paper:
 
-> E. Tiukhova, E. Penaloza, M. Óskarsdóttir, H. Garcia, A. Correa Bahnsen, B. Baesens, M. Snoeck, C. Bravo (2022). Influencer Detection with Dynamic Graph Neural Networks. *NeurIPS 2022 Temporal Graph Learning Workshop*. <https://doi.org/10.48550/arXiv.2211.09664>
+> E. Tiukhova, E. Penaloza, H. Garcia, A. Correa Bahnsen, M. Óskarsdóttir, B. Baesens, M. Snoeck, C. Bravo (2022). Influencer Detection with Dynamic Graph Neural Networks. *NeurIPS 2022 Temporal Graph Learning Workshop*. <https://doi.org/10.48550/arXiv.2211.09664>
 
 Link to the paper: https://arxiv.org/abs/2211.09664
 
@@ -157,7 +157,7 @@ Not released. The repository holds no trained weights, and it does not state a r
 ```bibtex
 @inproceedings{tiukhova2022influencer,
   title         = {Influencer Detection with Dynamic Graph Neural Networks},
-  author        = {Tiukhova, Elena and Penaloza, Emiliano and Óskarsdóttir, María and Garcia, Hernan and Correa Bahnsen, Alejandro and Baesens, Bart and Snoeck, Monique and Bravo, Cristián},
+  author        = {Tiukhova, Elena and Penaloza, Emiliano and Garcia, Hernan and Correa Bahnsen, Alejandro and Óskarsdóttir, María and Baesens, Bart and Snoeck, Monique and Bravo, Cristián},
   booktitle     = {NeurIPS 2022 Temporal Graph Learning Workshop},
   year          = {2022},
   eprint        = {2211.09664},
