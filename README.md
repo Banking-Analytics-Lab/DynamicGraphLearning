@@ -171,7 +171,7 @@ Not released. The repository holds no trained weights, and it does not state a r
 
 ## Licence
 
-Licence: pending.
+Apache License 2.0. See [LICENSE](LICENSE).
 
 ## Acknowledgements
 

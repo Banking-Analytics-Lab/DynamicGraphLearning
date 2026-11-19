@@ -1,6 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this code, please cite the paper below."
 title: "DynamicGraphLearning"
+license: Apache-2.0
 type: software
 repository-code: "https://github.com/Banking-Analytics-Lab/DynamicGraphLearning"
 authors:
